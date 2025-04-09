@@ -33,9 +33,9 @@ Este proyecto consiste en la generación y análisis de un dataset obtenido medi
 ## 🤖 Aplicaciones futuras
 
 - Robótica y navegación autónoma
-- Optimización de rutas
-- Procesamiento de señales de sensores en tiempo real
-- Aprendizaje automático con datos físicos
+- Creación de una pulsera que ayude a la movilidad de personas e baja visión, y que alerte cuando esten muy cerca de golpearse
+- Procesamiento de señales de sensores en tiempo real, para el mejoramiento de automoviles autónomos
+- Modelos de inteligencia artificial
 
 ---
 
