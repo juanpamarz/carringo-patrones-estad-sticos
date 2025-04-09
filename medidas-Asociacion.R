@@ -1,0 +1,52 @@
+# PROYECTO: SISTEMA EXPERIMENTAL CON SENSORES ULTRASÓNICOS PARA AUTOMATIZACIÓN AUTOMOTRIZ
+# EN ESTE CÓDIGO, NUESTRO EQUIPO REALIZÓ EL ANÁLISIS DE MEDIDAS DE ASOCIACIÓN:
+# MATRIZ DE COVARIANZAS, MATRIZ DE CORRELACIÓN Y GRAFO DE DEPENDENCIAS
+
+# CARGAMOS LAS LIBRERÍAS QUE NECESITAMOS
+# SI NO LAS TENEMOS, DESCOMENTAMOS LAS SIGUIENTES LÍNEAS PARA INSTALARLAS:
+# install.packages("corrplot")
+# install.packages("igraph")
+
+library(corrplot)   # CON ESTA LIBRERÍA VISUALIZAMOS LA MATRIZ DE CORRELACIÓN
+library(igraph)     # CON ESTA LIBRERÍA GENERAMOS Y GRAFICAMOS EL GRAFO DE DEPENDENCIAS
+
+# SUBIMOS NUESTRO DATASET DESDE LA COMPUTADORA (SE ABRE UN DIÁLOGO PARA ELEGIR EL ARCHIVO)
+datos <- read.csv(file.choose())
+
+# MOSTRAMOS LAS PRIMERAS FILAS PARA VER CÓMO ESTÁ ESTRUCTURADO NUESTRO DATASET
+head(datos)
+
+# CALCULAMOS LA MATRIZ DE COVARIANZAS (UTILIZAMOS "complete.obs" PARA OMITIR VALORES FALTANTES)
+matriz_cov <- cov(datos, use = "complete.obs")
+cat("MATRIZ DE COVARIANZAS:\n")
+print(matriz_cov)
+
+# CALCULAMOS LA MATRIZ DE CORRELACIÓN
+matriz_cor <- cor(datos, use = "complete.obs")
+cat("\nMATRIZ DE CORRELACIÓN:\n")
+print(matriz_cor)
+
+# VISUALIZAMOS LA MATRIZ DE CORRELACIÓN CON 'corrplot'
+corrplot(matriz_cor, method = "circle", type = "upper", tl.cex = 0.8, tl.col = "black", addCoef.col = "black")
+
+# --- GRAFO DE DEPENDENCIAS ---
+# DEFINIMOS UN UMBRAL PARA FILTRAR LAS CORRELACIONES DÉBILES (EJEMPLO: 0.5)
+umbral <- 0.5
+
+# CREAMOS LA MATRIZ DE ADYACENCIA A PARTIR DE LA MATRIZ DE CORRELACIÓN
+matriz_adjacencia <- matriz_cor
+matriz_adjacencia[abs(matriz_adjacencia) < umbral] <- 0  # FILTRAMOS LOS VALORES SEGÚN EL UMBRAL
+diag(matriz_adjacencia) <- 0  # ELIMINAMOS LAS CONEXIONES CON NOSOTROS MISMOS
+
+# GENERAMOS EL GRAFO USANDO LA MATRIZ DE ADYACENCIA
+grafo <- graph.adjacency(matriz_adjacencia, mode = "undirected", weighted = TRUE, diag = FALSE)
+
+# CONFIGURAMOS LAS ETIQUETAS PARA LOS NODOS (OPCIONAL)
+V(grafo)$label <- V(grafo)$name
+
+# GRAFICAMOS EL GRAFO DE DEPENDENCIAS
+plot(grafo,
+     vertex.size = 25,
+     vertex.label.cex = 0.8,
+     edge.width = E(grafo)$weight * 2,  # ESCALAMOS EL GROSOR DE LAS ARISTAS SEGÚN EL PESO
+     main = "GRAFO DE DEPENDENCIAS BASADO EN CORRELACIONES")
